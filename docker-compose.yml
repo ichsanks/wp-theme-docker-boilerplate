@@ -1,0 +1,36 @@
+version: '3'
+services:
+    wordpress:
+        depends_on: 
+            - mysqldb
+        image: wordpress:latest
+        ports:
+            - "8001:80"
+        environment:
+            WORDPRESS_DB_HOST: ${MYSQL_HOST}
+            WORDPRESS_DB_USER: ${MYSQL_ROOT_USER}
+            WORDPRESS_DB_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+        volumes:
+            - "./theme:/var/www/html/wp-content/${THEME_DIR}"
+    phpmyadmin:
+        image: phpmyadmin/phpmyadmin        
+        ports:
+            - "8081:80"
+        environment:
+            - PMA_ARBITRARY=1
+            - PMA_HOST=${MYSQL_HOST}
+        depends_on:
+            - mysqldb
+    mysqldb:
+        image: mysql
+        env_file:
+            - ".env"
+        environment:
+            - MYSQL_DATABASE=${MYSQL_DATABASE}
+            - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+            - MYSQL_USER=${MYSQL_USER}
+            - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+        ports:
+            - "8989:3306"
+        volumes:
+            - "./data/db/mysql:/var/lib/mysql"
